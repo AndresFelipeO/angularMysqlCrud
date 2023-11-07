@@ -86,11 +86,11 @@ class UserController {
 
     public async loginUser(req: Request, res: Response) {
 
-        const { username, password } = req.body;
+        try{
+            const { username, password } = req.body;
 
         // Validamos si el usuario existe en la base de datos
         const user: any = await User.findOne({ where: { username: username } });
-
         if (!user) {
             return res.status(400).json({
                 msg: `No existe un usuario con el nombre ${username} en la base datos`
@@ -98,7 +98,7 @@ class UserController {
         }
 
         // Validamos password
-        const passwordValid = await bcrypt.compare(password, user.password)
+        const passwordValid = await bcrypt.compare(password, user.user_password)
         if (!passwordValid) {
             return res.status(400).json({
                 msg: `Password Incorrecta`
@@ -107,10 +107,18 @@ class UserController {
 
         // Generamos token
         const token = jwt.sign({
-            username: username
+            username: username,
+            id:user.userid
         }, process.env.SECRET_KEY || 'pepito123');
 
         res.json(token);
+        }
+        catch (error) {
+            console.error('Error:', error);
+            res.status(500).json({ error: 'no se pudo iniciar sesion' });
+        }
+    
+        
     }
 }
 

@@ -100,26 +100,33 @@ class UserController {
     }
     loginUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { username, password } = req.body;
-            // Validamos si el usuario existe en la base de datos
-            const user = yield user_1.User.findOne({ where: { username: username } });
-            if (!user) {
-                return res.status(400).json({
-                    msg: `No existe un usuario con el nombre ${username} en la base datos`
-                });
+            try {
+                const { username, password } = req.body;
+                // Validamos si el usuario existe en la base de datos
+                const user = yield user_1.User.findOne({ where: { username: username } });
+                if (!user) {
+                    return res.status(400).json({
+                        msg: `No existe un usuario con el nombre ${username} en la base datos`
+                    });
+                }
+                // Validamos password
+                const passwordValid = yield bcrypt_1.default.compare(password, user.user_password);
+                if (!passwordValid) {
+                    return res.status(400).json({
+                        msg: `Password Incorrecta`
+                    });
+                }
+                // Generamos token
+                const token = jsonwebtoken_1.default.sign({
+                    username: username,
+                    id: user.userid
+                }, process.env.SECRET_KEY || 'pepito123');
+                res.json(token);
             }
-            // Validamos password
-            const passwordValid = yield bcrypt_1.default.compare(password, user.password);
-            if (!passwordValid) {
-                return res.status(400).json({
-                    msg: `Password Incorrecta`
-                });
+            catch (error) {
+                console.error('Error:', error);
+                res.status(500).json({ error: 'no se pudo iniciar sesion' });
             }
-            // Generamos token
-            const token = jsonwebtoken_1.default.sign({
-                username: username
-            }, process.env.SECRET_KEY || 'pepito123');
-            res.json(token);
         });
     }
 }

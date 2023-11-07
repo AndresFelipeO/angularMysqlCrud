@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const shoppingListController_1 = __importDefault(require("../controllers/shoppingListController"));
+const validate_token_1 = __importDefault(require("./validate-token"));
 class ShoppingListRoutes {
     constructor() {
         this.router = (0, express_1.Router)();
@@ -14,7 +15,7 @@ class ShoppingListRoutes {
         //ruta inicial
         this.router.get('/', shoppingListController_1.default.list);
         this.router.get('/:id', shoppingListController_1.default.getOne);
-        this.router.get('/user/:id', shoppingListController_1.default.listUser);
+        this.router.get('/user/:id', validate_token_1.default, shoppingListController_1.default.listUser);
         this.router.post('/', shoppingListController_1.default.create);
         this.router.put('/:id', shoppingListController_1.default.update);
         this.router.delete('/:id', shoppingListController_1.default.delete);
