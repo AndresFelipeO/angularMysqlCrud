@@ -1,20 +1,22 @@
-import mysql from 'mysql2/promise';
-import keys from './keys'
+import { Sequelize } from "sequelize";
+import keys from './keys'; // Importa la configuración de las keys
 
-const pool=mysql.createPool(keys.database);
+const sequelize = new Sequelize(keys.database, {
+    dialect: 'mysql',
+    host: keys.host,
+    username: keys.user,
+    password: keys.password,
+});
 
+async function testDatabaseConnection() {
+  try {
+    await sequelize.authenticate();
+    console.log('Conexión a la base de datos exitosa');
+  } catch (error) {
+    console.error('Error al conectar a la base de datos:', error);
+  }
+}
 
-(async () => {
-    try {
-      const connection = await pool.getConnection();
-      console.log('DB is connected');
-  
-      // Realiza tus operaciones de base de datos aquí
-      // Ejemplo: const results = await connection.query('SELECT * FROM ...');
-      connection.release(); // Libera la conexión cuando hayas terminado
-    } catch (error) {
-      console.error('Error connecting to the database:', error);
-    }
-  })();
-
-export default pool; 
+// Llamamos a la función para probar la conexión
+testDatabaseConnection();
+export default sequelize;

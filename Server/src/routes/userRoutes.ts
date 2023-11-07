@@ -9,7 +9,7 @@ class UserRoutes{
     config():void{
         //ruta inicial
         this.router.get('/',userController.list)
-        this.router.get('/:id',userController.getOne)
+        this.router.post('/login',userController.loginUser);
         this.router.post('/',userController.create)
         this.router.put('/:id',userController.update)
         this.router.delete('/:id',userController.delete)

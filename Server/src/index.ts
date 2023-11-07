@@ -8,6 +8,11 @@ import shoppingListRoutes from './routes/shoppingListRoutes';
 import supplierRoutes from './routes/supplierRoutes';
 import productRoutes from './routes/productRoutes';
 import listProductRoute from './routes/listProductRoute';
+import { User } from './models/user';
+import { Shopping_list } from './models/shopping_list';
+import { Supplier } from './models/supplier';
+import { Product } from './models/product';
+import { List_product } from './models/list_product';
 
 class Server{
     public app:Application;
@@ -15,6 +20,7 @@ class Server{
         this.app=express();
         this.config();
         this.routes();
+        this.dbConnect()
     }
     config():void{
         this.app.set('port',process.env.PORT || 3000);
@@ -37,7 +43,18 @@ class Server{
             console.log('server port ',this.app.get('port'));
         });
     }
-}
+    async dbConnect() {
+        try {
+            await User.sync();
+            await Shopping_list.sync();
+            await Supplier.sync();
+            await Product.sync();
+            await List_product.sync();
+        } catch (error) {
+            console.error('Unable to connect to the database:', error);
+        }
+    } 
+} 
 
 const server=new Server();
 server.start();

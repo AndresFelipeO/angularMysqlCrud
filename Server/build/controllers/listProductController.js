@@ -8,49 +8,91 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const databases_1 = __importDefault(require("../databases"));
+const list_product_1 = require("../models/list_product");
 class ProductListController {
     list(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const supplier = yield databases_1.default.query('SELECT * FROM list_product');
-            res.json(supplier[0]);
+            const list_product = yield list_product_1.List_product.findAll();
+            res.json(list_product);
         });
     }
     getOne(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const supplier = yield databases_1.default.query('Select * from list_product where listid = ?', [id]);
-            if (supplier.length > 0) {
-                // console.log(user)
-                return res.json(supplier[0]);
+            const list_product = yield list_product_1.List_product.findOne({ where: { productid: id } });
+            if (list_product) {
+                return res.json(list_product);
             }
-            res.status(404).json("the list_product doesn't exists");
+            res.status(404).json("the product doesn't exists");
         });
     }
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield databases_1.default.query('INSERT INTO list_product set ?', [req.body]);
-            res.json({ text: 'create list_product' });
+            const { listid, productid, list_product_state } = req.body;
+            try {
+                // Guardarmos usuario en la base de datos
+                yield list_product_1.List_product.create({
+                    listid: listid,
+                    productid: productid,
+                    list_product_state: list_product_state
+                });
+                res.json({
+                    msg: `se creo exitosamente!`
+                });
+            }
+            catch (error) {
+                res.status(400).json({
+                    msg: 'Upps ocurrio un error',
+                    error
+                });
+            }
         });
     }
     update(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const { idp } = req.params;
-            yield databases_1.default.query('Update list_product set ? where listid = ? and productid = ?', [req.body, id, idp]);
-            res.json({ text: 'list_product update' });
+            const id = req.params.id;
+            const { list_product_state } = req.body;
+            try {
+                const updatedProduct = yield list_product_1.List_product.update({
+                    list_product_state: list_product_state
+                }, {
+                    where: { listid: id }, // Condición para encontrar el usuario a actualizar
+                });
+                if (updatedProduct[0] === 1) {
+                    // Si updatedUser[0] es igual a 1, significa que se actualizó un registro
+                    res.json({ message: 'actualizado con éxito' });
+                }
+                else {
+                    res.json({ message: 'No se encontró o no se realizó ninguna actualización' });
+                }
+            }
+            catch (error) {
+                console.error('Error al actualizar:', error);
+                res.status(500).json({ error: 'No se pudo actualizar' });
+            }
         });
     }
     delete(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
             const { idp } = req.params;
-            yield databases_1.default.query('delete from list_product where listid = ? and productid = ?', [id, idp]);
-            res.json({ text: 'list_product delete' });
+            try {
+                const deletedProduct = yield list_product_1.List_product.destroy({
+                    where: { listid: id, productid: idp }, // Condición para encontrar el usuario a eliminar
+                });
+                if (deletedProduct === 1) {
+                    // Si deletedUser es igual a 1, significa que se eliminó un registro
+                    res.json({ message: 'eliminado con éxito' });
+                }
+                else {
+                    res.json({ message: 'No se encontró o no se realizó ninguna eliminación' });
+                }
+            }
+            catch (error) {
+                console.error('Error al eliminar:', error);
+                res.status(500).json({ error: 'No se pudo eliminar ' });
+            }
         });
     }
 }

@@ -13,7 +13,7 @@ class UserRoutes {
     config() {
         //ruta inicial
         this.router.get('/', userController_1.default.list);
-        this.router.get('/:id', userController_1.default.getOne);
+        this.router.post('/login', userController_1.default.loginUser);
         this.router.post('/', userController_1.default.create);
         this.router.put('/:id', userController_1.default.update);
         this.router.delete('/:id', userController_1.default.delete);

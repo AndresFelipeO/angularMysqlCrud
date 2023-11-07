@@ -12,43 +12,114 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const databases_1 = __importDefault(require("../databases"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const user_1 = require("../models/user");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 class UserController {
     list(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const users = yield databases_1.default.query('SELECT userid, user_name, username FROM user');
-            res.json(users[0]);
-        });
-    }
-    getOne(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const user = yield databases_1.default.query('Select userid, user_name, username from user where userid = ?', [id]);
-            if (user.length > 0) {
-                // console.log(user)
-                return res.json(user[0]);
-            }
-            res.status(404).json("the user doesn't exists");
+            const users = yield user_1.User.findAll();
+            res.json(users);
         });
     }
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield databases_1.default.query('INSERT INTO user set ?', [req.body]);
-            res.json({ text: 'creando un user' });
+            const { user_name, username, user_password } = req.body;
+            // Validamos si el usuario ya existe en la base de datos
+            const user = yield user_1.User.findOne({ where: { username: username } });
+            if (user) {
+                return res.status(400).json({
+                    msg: `Ya existe un usuario con el nombre ${username}`
+                });
+            }
+            const hashedPassword = yield bcrypt_1.default.hash(user_password, 10);
+            try {
+                // Guardarmos usuario en la base de datos
+                yield user_1.User.create({
+                    user_name: user_name,
+                    username: username,
+                    user_password: hashedPassword
+                });
+                res.json({
+                    msg: `Usuario ${username} creado exitosamente!`
+                });
+            }
+            catch (error) {
+                res.status(400).json({
+                    msg: 'Upps ocurrio un error',
+                    error
+                });
+            }
         });
     }
     update(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            yield databases_1.default.query('Update user set ? where userid = ?', [req.body, id]);
-            res.json({ text: 'User update' });
+            const userId = req.params.id; // Obtén el ID del usuario a actualizar desde la solicitud
+            const { user_name, username, user_password } = req.body;
+            try {
+                const updatedUser = yield user_1.User.update({
+                    user_name: user_name,
+                    username: username,
+                }, {
+                    where: { userid: userId }, // Condición para encontrar el usuario a actualizar
+                });
+                if (updatedUser[0] === 1) {
+                    // Si updatedUser[0] es igual a 1, significa que se actualizó un registro
+                    res.json({ message: 'Usuario actualizado con éxito' });
+                }
+                else {
+                    res.json({ message: 'No se encontró el usuario o no se realizó ninguna actualización' });
+                }
+            }
+            catch (error) {
+                console.error('Error al actualizar el usuario:', error);
+                res.status(500).json({ error: 'No se pudo actualizar el usuario' });
+            }
         });
     }
     delete(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            yield databases_1.default.query('delete from user where userid = ?', [id]);
-            res.json({ text: 'User delete' });
+            const userId = req.params.id; // Obtén el ID del usuario a eliminar desde la solicitud
+            try {
+                const deletedUser = yield user_1.User.destroy({
+                    where: { userid: userId }, // Condición para encontrar el usuario a eliminar
+                });
+                if (deletedUser === 1) {
+                    // Si deletedUser es igual a 1, significa que se eliminó un registro
+                    res.json({ message: 'Usuario eliminado con éxito' });
+                }
+                else {
+                    res.json({ message: 'No se encontró el usuario o no se realizó ninguna eliminación' });
+                }
+            }
+            catch (error) {
+                console.error('Error al eliminar el usuario:', error);
+                res.status(500).json({ error: 'No se pudo eliminar el usuario' });
+            }
+        });
+    }
+    loginUser(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { username, password } = req.body;
+            // Validamos si el usuario existe en la base de datos
+            const user = yield user_1.User.findOne({ where: { username: username } });
+            if (!user) {
+                return res.status(400).json({
+                    msg: `No existe un usuario con el nombre ${username} en la base datos`
+                });
+            }
+            // Validamos password
+            const passwordValid = yield bcrypt_1.default.compare(password, user.password);
+            if (!passwordValid) {
+                return res.status(400).json({
+                    msg: `Password Incorrecta`
+                });
+            }
+            // Generamos token
+            const token = jsonwebtoken_1.default.sign({
+                username: username
+            }, process.env.SECRET_KEY || 'pepito123');
+            res.json(token);
         });
     }
 }

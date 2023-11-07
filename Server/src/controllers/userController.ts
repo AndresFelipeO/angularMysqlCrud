@@ -1,40 +1,118 @@
-import {Request, Response} from 'express'
+import { Request, Response, json } from 'express'
 
-import pool from '../databases'
+import bcrypt from 'bcrypt';
+import { User } from '../models/user';
+import jwt from 'jsonwebtoken';
 
-class UserController{
-    
-    public async list (req:Request,res:Response){
-        const users = await pool.query('SELECT userid, user_name, username FROM user');
-        
-        res.json(users[0]);
+class UserController {
+
+    public async list(req: Request, res: Response) {
+        const users = await User.findAll();
+        res.json(users);
     }
 
-    public async getOne(req:Request,res:Response):Promise<any>{
-        const {id}=req.params;
-        const user=await pool.query('Select userid, user_name, username from user where userid = ?',[id]);
-        if(user.length>0){
-           // console.log(user)
-            return res.json(user[0])
-        } 
-        res.status(404).json("the user doesn't exists")
+    public async create(req: Request, res: Response){
+
+        const { user_name, username, user_password } = req.body;
+        // Validamos si el usuario ya existe en la base de datos
+        const user = await User.findOne({ where: { username: username } });
+        if (user) {
+            return res.status(400).json({
+                msg: `Ya existe un usuario con el nombre ${username}`
+            })
+        }
+        const hashedPassword = await bcrypt.hash(user_password, 10);
+        try {
+            // Guardarmos usuario en la base de datos
+            await User.create({
+                user_name: user_name,
+                username: username,
+                user_password: hashedPassword
+            })
+            res.json({
+                msg: `Usuario ${username} creado exitosamente!`
+            })
+        } catch (error) {
+            res.status(400).json({
+                msg: 'Upps ocurrio un error',
+                error
+            })
+        }
+    }
+    public async update(req: Request, res: Response): Promise<void> {
+        const userId = req.params.id; // Obtén el ID del usuario a actualizar desde la solicitud
+        const { user_name, username, user_password } = req.body;
+        try {
+            const updatedUser = await User.update(
+                {
+                    user_name: user_name, // Nuevos valores para los campos que deseas actualizar
+                    username: username,
+                },
+                {
+                    where: { userid: userId }, // Condición para encontrar el usuario a actualizar
+                }
+            );
+
+            if (updatedUser[0] === 1) {
+                // Si updatedUser[0] es igual a 1, significa que se actualizó un registro
+                res.json({ message: 'Usuario actualizado con éxito' });
+            } else {
+                res.json({ message: 'No se encontró el usuario o no se realizó ninguna actualización' });
+            }
+        } catch (error) {
+            console.error('Error al actualizar el usuario:', error);
+            res.status(500).json({ error: 'No se pudo actualizar el usuario' });
+        }
+    }
+    public async delete(req: Request, res: Response) {
+        const userId = req.params.id; // Obtén el ID del usuario a eliminar desde la solicitud
+
+        try {
+            const deletedUser = await User.destroy({
+                where: { userid: userId }, // Condición para encontrar el usuario a eliminar
+            });
+
+            if (deletedUser === 1) {
+                // Si deletedUser es igual a 1, significa que se eliminó un registro
+                res.json({ message: 'Usuario eliminado con éxito' });
+            } else {
+                res.json({ message: 'No se encontró el usuario o no se realizó ninguna eliminación' });
+            }
+        } catch (error) {
+            console.error('Error al eliminar el usuario:', error);
+            res.status(500).json({ error: 'No se pudo eliminar el usuario' });
+        }
     }
 
-    public async create(req:Request,res:Response): Promise<void>{
-        await pool.query('INSERT INTO user set ?',[req.body])
-        res.json({text:'creando un user'})
-    }
-    public async update(req:Request,res:Response):Promise<void>{
-        const {id}=req.params;
-        await pool.query('Update user set ? where userid = ?',[req.body,id]);
-        res.json({text:'User update'})
-    }
-    public async delete(req:Request,res:Response){
-        const {id}=req.params;
-        await pool.query('delete from user where userid = ?',[id]);
-        res.json({text:'User delete'})
+    public async loginUser(req: Request, res: Response) {
+
+        const { username, password } = req.body;
+
+        // Validamos si el usuario existe en la base de datos
+        const user: any = await User.findOne({ where: { username: username } });
+
+        if (!user) {
+            return res.status(400).json({
+                msg: `No existe un usuario con el nombre ${username} en la base datos`
+            })
+        }
+
+        // Validamos password
+        const passwordValid = await bcrypt.compare(password, user.password)
+        if (!passwordValid) {
+            return res.status(400).json({
+                msg: `Password Incorrecta`
+            })
+        }
+
+        // Generamos token
+        const token = jwt.sign({
+            username: username
+        }, process.env.SECRET_KEY || 'pepito123');
+
+        res.json(token);
     }
 }
 
-const indexController= new UserController();
+const indexController = new UserController();
 export default indexController;

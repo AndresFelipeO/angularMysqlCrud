@@ -12,19 +12,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const promise_1 = __importDefault(require("mysql2/promise"));
-const keys_1 = __importDefault(require("./keys"));
-const pool = promise_1.default.createPool(keys_1.default.database);
-(() => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const connection = yield pool.getConnection();
-        console.log('DB is connected');
-        // Realiza tus operaciones de base de datos aquí
-        // Ejemplo: const results = await connection.query('SELECT * FROM ...');
-        connection.release(); // Libera la conexión cuando hayas terminado
-    }
-    catch (error) {
-        console.error('Error connecting to the database:', error);
-    }
-}))();
-exports.default = pool;
+const sequelize_1 = require("sequelize");
+const keys_1 = __importDefault(require("./keys")); // Importa la configuración de las keys
+const sequelize = new sequelize_1.Sequelize(keys_1.default.database, {
+    dialect: 'mysql',
+    host: keys_1.default.host,
+    username: keys_1.default.user,
+    password: keys_1.default.password,
+});
+function testDatabaseConnection() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield sequelize.authenticate();
+            console.log('Conexión a la base de datos exitosa');
+        }
+        catch (error) {
+            console.error('Error al conectar a la base de datos:', error);
+        }
+    });
+}
+// Llamamos a la función para probar la conexión
+testDatabaseConnection();
+exports.default = sequelize;

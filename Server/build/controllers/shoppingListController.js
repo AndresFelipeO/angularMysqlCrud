@@ -8,25 +8,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const databases_1 = __importDefault(require("../databases"));
+const shopping_list_1 = require("../models/shopping_list");
 class ShoppingListController {
     list(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const shopping = yield databases_1.default.query('SELECT * FROM shopping_list');
-            res.json(shopping[0]);
+            const shopping = yield shopping_list_1.Shopping_list.findAll();
+            res.json(shopping);
         });
     }
     getOne(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const shopping = yield databases_1.default.query('Select * from shopping_list where listid = ?', [id]);
-            if (shopping.length > 0) {
-                // console.log(user)
-                return res.json(shopping[0]);
+            const shopping = yield shopping_list_1.Shopping_list.findOne({ where: { listid: id } });
+            if (shopping) {
+                return res.json(shopping);
             }
             res.status(404).json("the user doesn't exists");
         });
@@ -34,32 +30,77 @@ class ShoppingListController {
     listUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const shopping = yield databases_1.default.query('Select * from shopping_list where userid = ?', [id]);
-            if (shopping.length > 0) {
-                // console.log(user)
-                return res.json(shopping[0]);
+            const shopping = yield shopping_list_1.Shopping_list.findOne({ where: { userid: id } });
+            if (shopping) {
+                return res.json(shopping);
             }
             res.status(404).json("the user doesn't exists");
         });
     }
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield databases_1.default.query('INSERT INTO shopping_list set ?', [req.body]);
-            res.json({ text: 'create shopping list' });
+            const { userid, list_name } = req.body;
+            try {
+                // Guardarmos usuario en la base de datos
+                yield shopping_list_1.Shopping_list.create({
+                    list_name: list_name,
+                    userid: userid,
+                });
+                res.json({
+                    msg: `se creo la lista exitosamente!`
+                });
+            }
+            catch (error) {
+                res.status(400).json({
+                    msg: 'Upps ocurrio un error',
+                    error
+                });
+            }
         });
     }
     update(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            yield databases_1.default.query('Update shopping_list set ? where listid = ?', [req.body, id]);
-            res.json({ text: 'List update' });
+            const id = req.params.id;
+            const { list_name } = req.body;
+            try {
+                const updatedList = yield shopping_list_1.Shopping_list.update({
+                    list_name: list_name // Nuevos valores para los campos que deseas actualizar
+                }, {
+                    where: { listid: id }, // Condición para encontrar el usuario a actualizar
+                });
+                if (updatedList[0] === 1) {
+                    // Si updatedUser[0] es igual a 1, significa que se actualizó un registro
+                    res.json({ message: 'actualizado con éxito' });
+                }
+                else {
+                    res.json({ message: 'No se encontró o no se realizó ninguna actualización' });
+                }
+            }
+            catch (error) {
+                console.error('Error al actualizar:', error);
+                res.status(500).json({ error: 'No se pudo actualizar' });
+            }
         });
     }
     delete(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            yield databases_1.default.query('delete from shopping_list where listid = ?', [id]);
-            res.json({ text: 'List delete' });
+            const id = req.params.id; // Obtén el ID del usuario a eliminar desde la solicitud
+            try {
+                const deletedshopping = yield shopping_list_1.Shopping_list.destroy({
+                    where: { userid: id }, // Condición para encontrar el usuario a eliminar
+                });
+                if (deletedshopping === 1) {
+                    // Si deletedUser es igual a 1, significa que se eliminó un registro
+                    res.json({ message: 'shopping eliminado con éxito' });
+                }
+                else {
+                    res.json({ message: 'No se encontró o no se realizó ninguna eliminación' });
+                }
+            }
+            catch (error) {
+                console.error('Error al eliminar:', error);
+                res.status(500).json({ error: 'No se pudo eliminar ' });
+            }
         });
     }
 }

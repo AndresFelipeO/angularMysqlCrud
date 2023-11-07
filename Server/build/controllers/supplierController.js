@@ -8,47 +8,88 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const databases_1 = __importDefault(require("../databases"));
+const supplier_1 = require("../models/supplier");
 class SupplierController {
     list(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const supplier = yield databases_1.default.query('SELECT * FROM supplier');
-            res.json(supplier[0]);
+            const supplier = yield supplier_1.Supplier.findAll();
+            res.json(supplier);
         });
     }
     getOne(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const supplier = yield databases_1.default.query('Select * from supplier where supplierid = ?', [id]);
-            if (supplier.length > 0) {
-                // console.log(user)
-                return res.json(supplier[0]);
+            const supplier = yield supplier_1.Supplier.findOne({ where: { supplierid: id } });
+            if (supplier) {
+                return res.json(supplier);
             }
-            res.status(404).json("the supplier doesn't exists");
+            res.status(404).json("the Supplier doesn't exists");
         });
     }
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield databases_1.default.query('INSERT INTO supplier set ?', [req.body]);
-            res.json({ text: 'create supplier list' });
+            const { supplier_name } = req.body;
+            try {
+                // Guardarmos usuario en la base de datos
+                yield supplier_1.Supplier.create({
+                    supplier_name: supplier_name,
+                });
+                res.json({
+                    msg: `se creo exitosamente!`
+                });
+            }
+            catch (error) {
+                res.status(400).json({
+                    msg: 'Upps ocurrio un error',
+                    error
+                });
+            }
         });
     }
     update(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            yield databases_1.default.query('Update supplier set ? where supplierid = ?', [req.body, id]);
-            res.json({ text: 'supplier update' });
+            const id = req.params.id;
+            const { supplier_name } = req.body;
+            try {
+                const updatedSupplier = yield supplier_1.Supplier.update({
+                    supplier_name: supplier_name // Nuevos valores para los campos que deseas actualizar
+                }, {
+                    where: { supplierid: id }, // Condición para encontrar el usuario a actualizar
+                });
+                if (updatedSupplier[0] === 1) {
+                    // Si updatedUser[0] es igual a 1, significa que se actualizó un registro
+                    res.json({ message: 'actualizado con éxito' });
+                }
+                else {
+                    res.json({ message: 'No se encontró o no se realizó ninguna actualización' });
+                }
+            }
+            catch (error) {
+                console.error('Error al actualizar:', error);
+                res.status(500).json({ error: 'No se pudo actualizar' });
+            }
         });
     }
     delete(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            yield databases_1.default.query('delete from supplier where supplierid = ?', [id]);
-            res.json({ text: 'supplier delete' });
+            const id = req.params.id; // Obtén el ID del usuario a eliminar desde la solicitud
+            try {
+                const deletedSupplier = yield supplier_1.Supplier.destroy({
+                    where: { supplierid: id }, // Condición para encontrar el usuario a eliminar
+                });
+                if (deletedSupplier === 1) {
+                    // Si deletedUser es igual a 1, significa que se eliminó un registro
+                    res.json({ message: 'eliminado con éxito' });
+                }
+                else {
+                    res.json({ message: 'No se encontró o no se realizó ninguna eliminación' });
+                }
+            }
+            catch (error) {
+                console.error('Error al eliminar:', error);
+                res.status(500).json({ error: 'No se pudo eliminar ' });
+            }
         });
     }
 }
