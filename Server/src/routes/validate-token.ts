@@ -10,20 +10,13 @@ const validateToken = async (req: Request, res: Response, next: NextFunction) =>
         // Tiene token
         try {
             const bearerToken = headerToken.slice(7);
+            jwt.verify(bearerToken, process.env.SECRET_KEY || 'pepito123');
             const decodedToken: any = jwt.verify(bearerToken, process.env.SECRET_KEY || 'pepito123');
-
-           const {id}=req.params;
-            const user=await User.findOne({where: {
-                userid: id, // Filtra por el ID del usuario autenticado
-                username: decodedToken.username, // Filtra por el nombre de usuario del usuario autenticado
-              }});
-            if(user){
-                next();
-            } 
-           else {
-                res.status(403).json({ msg: 'Acceso denegado: No puedes ver las listas de otros usuarios' });
-              }
-        } catch (error) {
+             // Accede al ID del usuario desde el token decodificado
+            req.body={body:req.body,iduser:decodedToken.idUser}
+            next();
+        } 
+        catch (error) {
             res.status(401).json({
                 msg: 'token no valido'
             })
@@ -34,7 +27,6 @@ const validateToken = async (req: Request, res: Response, next: NextFunction) =>
             msg: 'Acceso denegado'
         })
     }
-
 }
 
 export default validateToken;

@@ -1,34 +1,41 @@
-import {Request, Response} from 'express'
+import { Request, Response } from 'express'
 import { Shopping_list } from '../models/shopping_list';
 
-class ShoppingListController{
-    
-    public async list (req:Request,res:Response){
+class ShoppingListController {
+
+    public async list(req: Request, res: Response) {
         const shopping = await Shopping_list.findAll()
         res.json(shopping);
     }
 
-    public async getOne(req:Request,res:Response):Promise<any>{
-        const {id}=req.params;
-        const shopping=await Shopping_list.findOne({where:{listid:id}});
-        if(shopping){
+    public async getOne(req: Request, res: Response): Promise<any> {
+        const { id } = req.params;
+        const shopping = await Shopping_list.findOne({ where: { listid: id } });
+        if (shopping) {
             return res.json(shopping)
-        } 
+        }
         res.status(404).json("the user doesn't exists")
     }
 
-    public async listUser(req:Request,res:Response):Promise<any>{
-        const {id}=req.params;
-        const shopping=await Shopping_list.findOne({where:{userid:id}});
-        if(shopping){
-            return res.json(shopping)
-        } 
-        res.status(404).json("the user doesn't exists")
+    public async listUser(req: Request, res: Response): Promise<any> {
+        try {
+            const { iduser } = req.body;
+            const shopping = await Shopping_list.findAll({ where: { userid: iduser } });
+            if (shopping) {
+                return res.json(shopping)
+            }
+            res.status(404).json("the user doesn't exists")
+        } catch (error) {
+            res.status(400).json({
+                msg: 'Upps ocurrio un error', 
+                error
+            })
+        }
     }
-    
 
-    public async create(req:Request,res:Response): Promise<void>{
-        const {userid, list_name } = req.body;
+
+    public async create(req: Request, res: Response): Promise<void> {
+        const { userid, list_name } = req.body;
         try {
             // Guardarmos usuario en la base de datos
             await Shopping_list.create({
@@ -45,9 +52,9 @@ class ShoppingListController{
             })
         }
     }
-    public async update(req:Request,res:Response):Promise<void>{
-        const id = req.params.id; 
-        const { list_name} = req.body;
+    public async update(req: Request, res: Response): Promise<void> {
+        const id = req.params.id;
+        const { list_name } = req.body;
         try {
             const updatedList = await Shopping_list.update(
                 {
@@ -69,8 +76,8 @@ class ShoppingListController{
             res.status(500).json({ error: 'No se pudo actualizar' });
         }
     }
-    
-    public async delete(req:Request,res:Response){
+
+    public async delete(req: Request, res: Response) {
         const id = req.params.id; // Obtén el ID del usuario a eliminar desde la solicitud
 
         try {
@@ -91,5 +98,5 @@ class ShoppingListController{
     }
 }
 
-const shoppingListController= new ShoppingListController();
+const shoppingListController = new ShoppingListController();
 export default shoppingListController;

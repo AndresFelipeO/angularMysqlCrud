@@ -11,6 +11,7 @@ class SupplierController{
 
     public async getOne(req:Request,res:Response):Promise<any>{
         const {id}=req.params;
+        console.log(id)
         const supplier=await Supplier.findOne({where:{supplierid:id}});
         if(supplier){
             return res.json(supplier)

@@ -29,12 +29,20 @@ class ShoppingListController {
     }
     listUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const shopping = yield shopping_list_1.Shopping_list.findOne({ where: { userid: id } });
-            if (shopping) {
-                return res.json(shopping);
+            try {
+                const { iduser } = req.body;
+                const shopping = yield shopping_list_1.Shopping_list.findAll({ where: { userid: iduser } });
+                if (shopping) {
+                    return res.json(shopping);
+                }
+                res.status(404).json("the user doesn't exists");
             }
-            res.status(404).json("the user doesn't exists");
+            catch (error) {
+                res.status(400).json({
+                    msg: 'Upps ocurrio un error',
+                    error
+                });
+            }
         });
     }
     create(req, res) {

@@ -119,7 +119,7 @@ class UserController {
                 // Generamos token
                 const token = jsonwebtoken_1.default.sign({
                     username: username,
-                    id: user.userid
+                    idUser: user.userid
                 }, process.env.SECRET_KEY || 'pepito123');
                 res.json(token);
             }

@@ -13,9 +13,9 @@ class ShoppingListRoutes {
     }
     config() {
         //ruta inicial
-        this.router.get('/', shoppingListController_1.default.list);
-        this.router.get('/:id', shoppingListController_1.default.getOne);
-        this.router.get('/user/:id', validate_token_1.default, shoppingListController_1.default.listUser);
+        this.router.get('/', validate_token_1.default, shoppingListController_1.default.listUser);
+        //this.router.get('/:id',shoppingListController.getOne)
+        //this.router.get('/user/:id',validateToken,shoppingListController.listUser)
         this.router.post('/', shoppingListController_1.default.create);
         this.router.put('/:id', shoppingListController_1.default.update);
         this.router.delete('/:id', shoppingListController_1.default.delete);

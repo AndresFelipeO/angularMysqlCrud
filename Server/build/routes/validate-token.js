@@ -13,25 +13,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const user_1 = require("../models/user");
 const validateToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const headerToken = req.headers['authorization'];
     if (headerToken != undefined && headerToken.startsWith('Bearer ')) {
         // Tiene token
         try {
             const bearerToken = headerToken.slice(7);
+            jsonwebtoken_1.default.verify(bearerToken, process.env.SECRET_KEY || 'pepito123');
             const decodedToken = jsonwebtoken_1.default.verify(bearerToken, process.env.SECRET_KEY || 'pepito123');
-            const { id } = req.params;
-            const user = yield user_1.User.findOne({ where: {
-                    userid: id,
-                    username: decodedToken.username, // Filtra por el nombre de usuario del usuario autenticado
-                } });
-            if (user) {
-                next();
-            }
-            else {
-                res.status(403).json({ msg: 'Acceso denegado: No puedes ver las listas de otros usuarios' });
-            }
+            // Accede al ID del usuario desde el token decodificado
+            req.body = { body: req.body, iduser: decodedToken.idUser };
+            next();
         }
         catch (error) {
             res.status(401).json({

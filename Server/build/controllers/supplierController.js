@@ -20,6 +20,7 @@ class SupplierController {
     getOne(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
+            console.log(id);
             const supplier = yield supplier_1.Supplier.findOne({ where: { supplierid: id } });
             if (supplier) {
                 return res.json(supplier);
