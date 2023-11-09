@@ -10,7 +10,7 @@ class ShoppingListRoutes{
     config():void{
         //ruta inicial
         this.router.get('/',validateToken,shoppingListController.listUser)
-        //this.router.get('/:id',shoppingListController.getOne)
+        this.router.get('/:id',validateToken,shoppingListController.getOne)
         //this.router.get('/user/:id',validateToken,shoppingListController.listUser)
         this.router.post('/',shoppingListController.create)
         this.router.put('/:id',shoppingListController.update)

@@ -10,11 +10,12 @@ class ShoppingListController {
 
     public async getOne(req: Request, res: Response): Promise<any> {
         const { id } = req.params;
-        const shopping = await Shopping_list.findOne({ where: { listid: id } });
+        const { iduser } = req.body;
+        const shopping = await Shopping_list.findOne({ where: { listid: id ,userid:iduser} });
         if (shopping) {
             return res.json(shopping)
         }
-        res.status(404).json("the user doesn't exists")
+        res.status(404).json("the shoppinglist doesn't exists")
     }
 
     public async listUser(req: Request, res: Response): Promise<any> {

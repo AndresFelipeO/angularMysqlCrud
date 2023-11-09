@@ -4,7 +4,9 @@ import { List_product } from '../models/list_product';
 class ProductListController {
 
   public async list(req: Request, res: Response) {
-    const list_product = await List_product.findAll();
+    const { id } = req.params;
+    console.log(id)
+    const list_product = await List_product.findAll({ where: { listid: id } });
     res.json(list_product);
   }
 

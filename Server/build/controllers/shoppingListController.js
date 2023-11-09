@@ -20,11 +20,12 @@ class ShoppingListController {
     getOne(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const shopping = yield shopping_list_1.Shopping_list.findOne({ where: { listid: id } });
+            const { iduser } = req.body;
+            const shopping = yield shopping_list_1.Shopping_list.findOne({ where: { listid: id, userid: iduser } });
             if (shopping) {
                 return res.json(shopping);
             }
-            res.status(404).json("the user doesn't exists");
+            res.status(404).json("the shoppinglist doesn't exists");
         });
     }
     listUser(req, res) {

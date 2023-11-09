@@ -13,7 +13,9 @@ const list_product_1 = require("../models/list_product");
 class ProductListController {
     list(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const list_product = yield list_product_1.List_product.findAll();
+            const { id } = req.params;
+            console.log(id);
+            const list_product = yield list_product_1.List_product.findAll({ where: { listid: id } });
             res.json(list_product);
         });
     }
