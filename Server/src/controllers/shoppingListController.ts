@@ -36,12 +36,14 @@ class ShoppingListController {
 
 
     public async create(req: Request, res: Response): Promise<void> {
-        const { userid, list_name } = req.body;
+        const { iduser, body } = req.body;
+        const{list_name}=body;
         try {
             // Guardarmos usuario en la base de datos
+            
             await Shopping_list.create({
                 list_name: list_name,
-                userid: userid,
+                userid: iduser,
             })
             res.json({
                 msg: `se creo la lista exitosamente!`
@@ -55,6 +57,7 @@ class ShoppingListController {
     }
     public async update(req: Request, res: Response): Promise<void> {
         const id = req.params.id;
+       
         const { list_name } = req.body;
         try {
             const updatedList = await Shopping_list.update(
@@ -80,10 +83,9 @@ class ShoppingListController {
 
     public async delete(req: Request, res: Response) {
         const id = req.params.id; // Obtén el ID del usuario a eliminar desde la solicitud
-
         try {
             const deletedshopping = await Shopping_list.destroy({
-                where: { userid: id }, // Condición para encontrar el usuario a eliminar
+                where: { listid: id }, // Condición para encontrar el usuario a eliminar
             });
 
             if (deletedshopping === 1) {

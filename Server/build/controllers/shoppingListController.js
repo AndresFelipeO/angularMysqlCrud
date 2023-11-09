@@ -48,12 +48,13 @@ class ShoppingListController {
     }
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { userid, list_name } = req.body;
+            const { iduser, body } = req.body;
+            const { list_name } = body;
             try {
                 // Guardarmos usuario en la base de datos
                 yield shopping_list_1.Shopping_list.create({
                     list_name: list_name,
-                    userid: userid,
+                    userid: iduser,
                 });
                 res.json({
                     msg: `se creo la lista exitosamente!`
@@ -96,7 +97,7 @@ class ShoppingListController {
             const id = req.params.id; // Obtén el ID del usuario a eliminar desde la solicitud
             try {
                 const deletedshopping = yield shopping_list_1.Shopping_list.destroy({
-                    where: { userid: id }, // Condición para encontrar el usuario a eliminar
+                    where: { listid: id }, // Condición para encontrar el usuario a eliminar
                 });
                 if (deletedshopping === 1) {
                     // Si deletedUser es igual a 1, significa que se eliminó un registro

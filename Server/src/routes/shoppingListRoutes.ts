@@ -12,9 +12,9 @@ class ShoppingListRoutes{
         this.router.get('/',validateToken,shoppingListController.listUser)
         this.router.get('/:id',validateToken,shoppingListController.getOne)
         //this.router.get('/user/:id',validateToken,shoppingListController.listUser)
-        this.router.post('/',shoppingListController.create)
-        this.router.put('/:id',shoppingListController.update)
-        this.router.delete('/:id',shoppingListController.delete)
+        this.router.post('/',validateToken,shoppingListController.create)
+        this.router.put('/:id',validateToken,shoppingListController.update)
+        this.router.delete('/:id',validateToken,shoppingListController.delete)
     }
 }
 
