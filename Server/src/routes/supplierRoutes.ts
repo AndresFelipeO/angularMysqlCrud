@@ -1,5 +1,6 @@
 import {Router} from 'express';
 import supplierController from '../controllers/supplierController'
+import validateToken from './validate-token';
 
 class SupplierRoutes{
     public router:Router=Router();
@@ -8,11 +9,11 @@ class SupplierRoutes{
     }
     config():void{
         //ruta inicial
-        this.router.get('/',supplierController.list)
-        this.router.get('/:id',supplierController.getOne)
-        this.router.post('/',supplierController.create)
-        this.router.put('/:id',supplierController.update)
-        this.router.delete('/:id',supplierController.delete)
+        this.router.get('/',validateToken,supplierController.list)
+        this.router.get('/:id',validateToken,supplierController.getOne)
+        this.router.post('/',validateToken,supplierController.create)
+        this.router.put('/:id',validateToken,supplierController.update)
+        this.router.delete('/:id',validateToken,supplierController.delete)
     }
 }
 

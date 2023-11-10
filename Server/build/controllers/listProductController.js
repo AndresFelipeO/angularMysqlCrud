@@ -55,12 +55,14 @@ class ProductListController {
     update(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const { list_product_state } = req.body;
+            const { body } = req.body;
+            const { list_product_state } = body;
+            console.log("ntro");
             try {
                 const updatedProduct = yield list_product_1.List_product.update({
                     list_product_state: list_product_state
                 }, {
-                    where: { listid: id }, // Condición para encontrar el usuario a actualizar
+                    where: { id: id }, // Condición para encontrar el usuario a actualizar
                 });
                 if (updatedProduct[0] === 1) {
                     // Si updatedUser[0] es igual a 1, significa que se actualizó un registro

@@ -10,9 +10,8 @@ class ListProductControllerRoutes{
     config():void{
         //ruta inicial
         this.router.get('/:id',validateToken,listProductController.list)
-        this.router.get('/product/:id',listProductController.getOne)
         this.router.post('/',validateToken,listProductController.create)
-        this.router.put('/:id/:idp',listProductController.update)
+        this.router.put('/:id',validateToken,listProductController.update)
         this.router.delete('/:id',validateToken,listProductController.delete)
     }
 }

@@ -71,7 +71,8 @@ class ShoppingListController {
     update(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const { list_name } = req.body;
+            const { body } = req.body;
+            const { list_name } = body;
             try {
                 const updatedList = yield shopping_list_1.Shopping_list.update({
                     list_name: list_name // Nuevos valores para los campos que deseas actualizar

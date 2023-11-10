@@ -4,8 +4,6 @@ import { User } from '../models/user';
 
 const validateToken = async (req: Request, res: Response, next: NextFunction) => {
     const headerToken = req.headers['authorization']
-
-
     if (headerToken != undefined && headerToken.startsWith('Bearer ')) {
         // Tiene token
         try {

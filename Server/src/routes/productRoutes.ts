@@ -1,5 +1,6 @@
 import {Router} from 'express';
 import productController from '../controllers/productController'
+import validateToken from './validate-token';
 
 class ProductRoutes{
     public router:Router=Router();
@@ -8,11 +9,11 @@ class ProductRoutes{
     }
     config():void{
         //ruta inicial
-        this.router.get('/',productController.list)
-        this.router.get('/:id',productController.getOne)
-        this.router.post('/',productController.create)
-        this.router.put('/:id',productController.update)
-        this.router.delete('/:id',productController.delete)
+        this.router.get('/',validateToken,productController.list)
+        this.router.get('/:id',validateToken,productController.getOne)
+        this.router.post('/',validateToken,productController.create)
+        this.router.put('/:id',validateToken,productController.update)
+        this.router.delete('/:id',validateToken,productController.delete)
     }
 }
 

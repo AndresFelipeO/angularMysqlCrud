@@ -44,14 +44,16 @@ class ProductListController {
   }
   public async update(req: Request, res: Response): Promise<void> {
     const id = req.params.id;
-    const { list_product_state } = req.body;
+    const {body } = req.body;
+    const { list_product_state } = body;
+    console.log("ntro")
     try {
       const updatedProduct = await List_product.update(
         {
           list_product_state: list_product_state
         },
         {
-          where: { listid: id }, // Condición para encontrar el usuario a actualizar
+          where: { id: id }, // Condición para encontrar el usuario a actualizar
         }
       );
 

@@ -56,9 +56,10 @@ class ShoppingListController {
         }
     }
     public async update(req: Request, res: Response): Promise<void> {
+      
         const id = req.params.id;
-       
-        const { list_name } = req.body;
+        const {body } = req.body;
+        const { list_name } = body;
         try {
             const updatedList = await Shopping_list.update(
                 {
