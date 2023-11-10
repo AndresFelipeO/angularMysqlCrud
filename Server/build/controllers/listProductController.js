@@ -31,7 +31,8 @@ class ProductListController {
     }
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { listid, productid, list_product_state } = req.body;
+            const { body } = req.body;
+            const { listid, productid, list_product_state } = body;
             try {
                 // Guardarmos usuario en la base de datos
                 yield list_product_1.List_product.create({
@@ -78,10 +79,9 @@ class ProductListController {
     delete(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const { idp } = req.params;
             try {
                 const deletedProduct = yield list_product_1.List_product.destroy({
-                    where: { listid: id, productid: idp }, // Condición para encontrar el usuario a eliminar
+                    where: { id: id }, // Condición para encontrar el usuario a eliminar
                 });
                 if (deletedProduct === 1) {
                     // Si deletedUser es igual a 1, significa que se eliminó un registro

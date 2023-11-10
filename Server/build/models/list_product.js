@@ -9,6 +9,12 @@ const databases_1 = __importDefault(require("../databases"));
 const shopping_list_1 = require("./shopping_list");
 const product_1 = require("./product");
 exports.List_product = databases_1.default.define('list_product', {
+    id: {
+        type: sequelize_1.DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
+    },
     listid: {
         type: sequelize_1.DataTypes.INTEGER,
         allowNull: false,

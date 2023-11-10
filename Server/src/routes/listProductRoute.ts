@@ -11,9 +11,9 @@ class ListProductControllerRoutes{
         //ruta inicial
         this.router.get('/:id',validateToken,listProductController.list)
         this.router.get('/product/:id',listProductController.getOne)
-        this.router.post('/',listProductController.create)
+        this.router.post('/',validateToken,listProductController.create)
         this.router.put('/:id/:idp',listProductController.update)
-        this.router.delete('/:id/:idp',listProductController.delete)
+        this.router.delete('/:id',validateToken,listProductController.delete)
     }
 }
 

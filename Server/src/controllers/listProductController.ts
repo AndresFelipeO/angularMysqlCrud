@@ -21,7 +21,8 @@ class ProductListController {
   }
 
   public async create(req: Request, res: Response): Promise<void> {
-    const { listid, productid, list_product_state } = req.body;
+    const { body } = req.body;
+    const { listid, productid, list_product_state } = body;
 
     try {
       // Guardarmos usuario en la base de datos
@@ -67,11 +68,9 @@ class ProductListController {
   }
   public async delete(req: Request, res: Response) {
     const { id } = req.params;
-    const { idp } = req.params;
-
     try {
       const deletedProduct = await List_product.destroy({
-        where: { listid: id,productid:idp }, // Condición para encontrar el usuario a eliminar
+        where: { id: id }, // Condición para encontrar el usuario a eliminar
       });
 
       if (deletedProduct === 1) {

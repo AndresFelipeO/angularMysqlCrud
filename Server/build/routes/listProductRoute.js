@@ -15,9 +15,9 @@ class ListProductControllerRoutes {
         //ruta inicial
         this.router.get('/:id', validate_token_1.default, listProductController_1.default.list);
         this.router.get('/product/:id', listProductController_1.default.getOne);
-        this.router.post('/', listProductController_1.default.create);
+        this.router.post('/', validate_token_1.default, listProductController_1.default.create);
         this.router.put('/:id/:idp', listProductController_1.default.update);
-        this.router.delete('/:id/:idp', listProductController_1.default.delete);
+        this.router.delete('/:id', validate_token_1.default, listProductController_1.default.delete);
     }
 }
 const listProductControllerRoutes = new ListProductControllerRoutes();

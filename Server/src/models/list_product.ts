@@ -4,6 +4,12 @@ import { Shopping_list } from './shopping_list';
 import { Product } from './product';
 
 export const List_product = sequelize.define('list_product', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+    allowNull: false,
+  },
     listid: {
         type: DataTypes.INTEGER,
         allowNull: false,
