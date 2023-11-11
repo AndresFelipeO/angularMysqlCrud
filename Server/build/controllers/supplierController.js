@@ -30,7 +30,8 @@ class SupplierController {
     }
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { supplier_name } = req.body;
+            const { body } = req.body;
+            const { supplier_name } = body;
             try {
                 // Guardarmos usuario en la base de datos
                 yield supplier_1.Supplier.create({
@@ -51,7 +52,8 @@ class SupplierController {
     update(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const { supplier_name } = req.body;
+            const { body } = req.body;
+            const { supplier_name } = body;
             try {
                 const updatedSupplier = yield supplier_1.Supplier.update({
                     supplier_name: supplier_name // Nuevos valores para los campos que deseas actualizar

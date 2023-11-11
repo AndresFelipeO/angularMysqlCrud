@@ -20,7 +20,8 @@ class SupplierController{
     }
 
     public async create(req:Request,res:Response): Promise<void>{
-        const { supplier_name } = req.body;
+        const {body } = req.body;
+        const { supplier_name } = body;
         try {
             // Guardarmos usuario en la base de datos
             await Supplier.create({
@@ -37,8 +38,9 @@ class SupplierController{
         }
     }
     public async update(req:Request,res:Response):Promise<void>{
-        const id = req.params.id; 
-        const { supplier_name} = req.body;
+        const id = req.params.id;
+        const {body } = req.body; 
+        const { supplier_name} = body;
         try {
             const updatedSupplier = await Supplier.update(
                 {
@@ -62,7 +64,6 @@ class SupplierController{
     }
     public async delete(req:Request,res:Response){
         const id = req.params.id; // Obtén el ID del usuario a eliminar desde la solicitud
-
         try {
             const deletedSupplier = await Supplier.destroy({
                 where: { supplierid: id }, // Condición para encontrar el usuario a eliminar

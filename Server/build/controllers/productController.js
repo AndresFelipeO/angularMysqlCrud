@@ -29,7 +29,8 @@ class ProductController {
     }
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { product_name, product_price, supplierid } = req.body;
+            const { body } = req.body;
+            const { product_name, product_price, supplierid } = body;
             try {
                 // Guardarmos usuario en la base de datos
                 yield product_1.Product.create({
@@ -52,7 +53,8 @@ class ProductController {
     update(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id;
-            const { product_name, product_price } = req.body;
+            const { body } = req.body;
+            const { product_name, product_price } = body;
             try {
                 const updatedProduct = yield product_1.Product.update({
                     product_name: product_name,
@@ -77,6 +79,7 @@ class ProductController {
     delete(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const id = req.params.id; // Obtén el ID del usuario a eliminar desde la solicitud
+            console.log(id);
             try {
                 const deletedProduct = yield product_1.Product.destroy({
                     where: { productid: id }, // Condición para encontrar el usuario a eliminar

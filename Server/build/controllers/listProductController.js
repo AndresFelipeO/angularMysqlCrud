@@ -57,7 +57,6 @@ class ProductListController {
             const id = req.params.id;
             const { body } = req.body;
             const { list_product_state } = body;
-            console.log("ntro");
             try {
                 const updatedProduct = yield list_product_1.List_product.update({
                     list_product_state: list_product_state

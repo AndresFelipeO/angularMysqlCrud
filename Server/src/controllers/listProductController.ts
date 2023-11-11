@@ -46,7 +46,6 @@ class ProductListController {
     const id = req.params.id;
     const {body } = req.body;
     const { list_product_state } = body;
-    console.log("ntro")
     try {
       const updatedProduct = await List_product.update(
         {
